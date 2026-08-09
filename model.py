@@ -239,8 +239,8 @@ def Evaluate_NN(data,label,nn_hidden,_output_container,embed_dim=32,max_len=128,
         log.append(str(max_len*embed_dim) + " -> "+str(nn_hidden[0]))
 
         for i in range(len(nn_hidden) - 1):
-            output_container.write((nn_hidden[i])+" -> "+str(nn_hidden[i+1]))
-            log.append((nn_hidden[i])+" -> "+str(nn_hidden[i+1]))
+            output_container.write(str(nn_hidden[i])+" -> "+str(nn_hidden[i+1]))
+            log.append(str(nn_hidden[i])+" -> "+str(nn_hidden[i+1]))
 
         output_container.write(str(nn_hidden[-1])+" -> 2")
         log.append(str(nn_hidden[-1])+" -> 2")
