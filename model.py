@@ -17,7 +17,7 @@ def Read_Training_Dataset():
         current_dir = os.path.dirname(os.path.abspath(__file__))
         #imdb = pd.read_csv(current_dir + "\\Training_Dataset\\imdb_master.csv", encoding='latin-1')
         path = kagglehub.dataset_download("utathya/imdb-review-dataset",force_download=True)
-        imdb = pd.read_csv(path + "\\imdb_master.csv", encoding='latin-1')
+        imdb = pd.read_csv(path + "/imdb_master.csv", encoding='latin-1')
 
         y = imdb["label"].map({"neg":0,"pos":1})
         y = y.loc[~(y.isna())]
