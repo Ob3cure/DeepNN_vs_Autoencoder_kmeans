@@ -4,6 +4,9 @@ import model
 
 st.set_page_config(layout="wide")
 
+if "init" not in st.session_state:
+    st.session_state["init"] = False
+
 if "training" not in st.session_state:
     st.session_state["training"] = "None"
 
@@ -15,6 +18,17 @@ if "ac_result" not in st.session_state:
 
 if "km_result" not in st.session_state:
     st.session_state["km_result"] = "None"
+
+if not(st.session_state.init):
+    st.write("It may takes a while to load the dataset.")
+
+DataFrame,X,y = model.Read_Training_Dataset()
+if(DataFrame is None):
+    st.error("Error on handling read csv:" + str(X))
+
+if not(st.session_state.init):
+    st.session_state.init = True
+    st.rerun()
 
 max_len = 128
 nn_hidden = [2]
@@ -31,10 +45,6 @@ with Sidebar:
         train_data_ratio = st.selectbox("Train Data Ratio",[0.5,0.6,0.7,0.8,0.9,0.95],disabled=True)
         training_epoch = st.selectbox("Training epoch",[1,5,30,50,80,100,300,500,1000],disabled=True)
         kmeans_apply_epoch = st.selectbox("KMeans apply epoch",[1,5,10,12,20],disabled=True)
-
-DataFrame,X,y = model.Read_Training_Dataset()
-if(DataFrame is None):
-    st.error("Error on handling read csv:" + str(X))
 
 st.title("Train the classification model and view the performance.")
 

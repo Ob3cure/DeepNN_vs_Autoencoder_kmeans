@@ -26,6 +26,7 @@ def Read_Training_Dataset():
 
         tokenizer = SimpleTokenizer(max_length=128)
         input_ids, _ = tokenizer.fit_transform(_X)
+
         return imdb,input_ids,y
     except Exception as e:
         print(f"Error on reading dataset:{e}")
@@ -145,6 +146,13 @@ def autoencoder_kmeans_eval(autoencoder,X,y,epoch=10):
         mse += ((labels - y) ** 2).mean()
 
     mse = mse / epoch
+
+    #This is because the classification work is symmetric. 
+    #When there are more than x>50% data are allocated to the wrong cluster, that means there are 1-x data will be classified correctly if we flip the id of clusters.
+    #This is applicable since the model does not whether elemnts in cluster 1 corresponds to label 1 or 0.
+    if(mse > 0.5):
+        mse = 1-mse
+
     for param in autoencoder.parameters():
         param.requires_grad = True
     return labels,mse
@@ -155,7 +163,11 @@ def kmeans_eval(X,y,epoch=10):
     for i in range(epoch):
         mse += ((KMeans(2).fit(X).predict(X) - y) ** 2).mean()
 
-    return mse / epoch
+    error = mse / epoch
+    if error > 0.5:
+        error = 1 - error
+
+    return error
 
 def Evaluate_NN(data,label,nn_hidden,_output_container,embed_dim=32,max_len=128,_progress_bar=None,voc_size=10000,train_to_test_data_ratio=0.8,training_epoch=1):
     output_container = _output_container
@@ -199,7 +211,20 @@ def Evaluate_NN(data,label,nn_hidden,_output_container,embed_dim=32,max_len=128,
     dataloader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=True)
     train_xentropy(deep_nn,optimizer,dataloader,output_container,progress_bar,log=log,epoch=training_epoch)
 
-    accuracy_nn = ((torch.argmax(deep_nn(torch.tensor(test_data)),dim=-1) - torch.tensor(test_label,dtype=torch.float32)) ** 2).mean().item()
+    y_pred = torch.argmax(deep_nn(torch.tensor(test_data)),dim=-1)
+    accuracy_nn = ((y_pred - torch.tensor(test_label,dtype=torch.float32)) ** 2).mean().item()
+
+    example = []
+    example_label = []
+    for i in range(3):
+        index = np.random.randint(0,50000-split)
+        data,_,__ = Read_Training_Dataset()
+        example.append(data.loc[~(data["label"].map({"neg":0,"pos":1}).isna()),"review"][index + split])
+        if y_pred[index].item() == 0:
+            example_label.append("Negative")
+        else:
+            example_label.append("Positive")
+
     output_container.write("--------------------------------------")
     log.append("--------------------------------------")
 
@@ -225,6 +250,16 @@ def Evaluate_NN(data,label,nn_hidden,_output_container,embed_dim=32,max_len=128,
 
     output_container.write("With training epoch "+str(training_epoch))
     log.append("With training epoch "+str(training_epoch))
+
+    output_container.write("--------------------------------------")
+    log.append("--------------------------------------")
+
+    output_container.write("Prediction Examples")
+    log.append("Prediction Examples")
+
+    for i in range(3):
+        output_container.write(example[i]+":"+example_label[i])
+        log.append(example[i]+":"+example_label[i])
 
     output_container.write("--------------------------------------")
     log.append("--------------------------------------")
