@@ -215,4 +215,6 @@ else:
     km_train_status.badge("Training Status:Waiting",color="gray")    
 
 st.divider()
-st.write("Models are trained using imdb review dataset. You may check the dataset on https://www.kaggle.com/datasets/utathya/imdb-review-dataset")
+st.write("This application is open sourced you can view it on https://github.com/Ob3cure/DeepNN_vs_Autoencoder_kmeans.git")
+st.write("Models are trained using imdb review dataset. You may check the dataset on https://www.kaggle.com/datasets/utathya/imdb-review-dataset.")
+st.write("This application is intended for experimental use only, not for training a classification model.")
