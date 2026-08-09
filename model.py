@@ -314,7 +314,6 @@ def Evaluate_AC(data, label, ac_hidden, _output_container,
     _, accuracy_ac = autoencoder_kmeans_eval(autoencoder, torch.tensor(test_data),
                                              test_label, epoch=kmeans_apply_epoch)
 
-    # 输出最终结果
     sep = "--------------------------------------"
     output_container.write(sep)
     log.append(sep)
@@ -330,7 +329,6 @@ def Evaluate_AC(data, label, ac_hidden, _output_container,
     output_container.write(sep)
     log.append(sep)
 
-    # 存入缓存
     cache[key] = (accuracy_ac, log)
     return accuracy_ac
 
